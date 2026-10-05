@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, Truck, Banknote, MessageCircle, RotateCcw, Sparkles } from "lucide-react";
-import Hero from "@/components/Hero";
+import Hero, { type HeroSlide } from "@/components/Hero";
+import Rail from "@/components/Rail";
+import ReviewsCarousel from "@/components/ReviewsCarousel";
+import BigMarquee from "@/components/BigMarquee";
+import { SectionHead } from "@/components/WordReveal";
+import { money } from "@/lib/format";
 import Reveal from "@/components/Reveal";
 import ProductCard from "@/components/ProductCard";
 import AbayaArt from "@/components/AbayaArt";
@@ -16,31 +21,41 @@ const features = [
   { icon: RotateCcw, t: "Easy exchanges", d: "Size not right? We'll swap it" },
 ];
 
-const reviews = [
-  { n: "Fatima R.", t: "The fabric is unbelievably soft and the fit is perfect. I've already ordered a second one." },
-  { n: "Aisha K.", t: "Ordered Sunday, confirmed on WhatsApp within minutes, arrived in two days. Beautiful packaging too." },
-  { n: "Mariam S.", t: "Finally an abaya that looks elegant but is comfortable enough for all-day wear." },
-];
-
 export default async function Home() {
   const [products, categories, settings] = await Promise.all([getProducts(), getCategories(), getSettings()]);
   const featured = (products.filter((p) => p.is_featured).length ? products.filter((p) => p.is_featured) : products).slice(0, 4);
   const newest = products.slice(0, 8);
   const swatches = ["#141414", "#c9b08a", "#0f5c4a", "#c98a96"];
 
+  const lineSplit = (name: string) => {
+    const w = name.split(" ");
+    if (w.length <= 3) return w;
+    const mid = Math.ceil(w.length / 2);
+    return [w.slice(0, mid).join(" "), w.slice(mid).join(" ")];
+  };
+  const slides: HeroSlide[] = [
+    { id: "brand", eyebrow: "New Season Collection", lines: ["Modest.", "Modern.", "Yours."], big: true, text: "Abayas cut from breathable, luxurious fabrics and finished by hand. Designed for every day, made for every occasion — delivered to your door.", href: "/shop", cta: "Shop the collection", colors: ["#141414", "#0f5c4a"], images: [featured[0]?.images[0] ?? null, featured[1]?.images[0] ?? null] },
+    ...featured.slice(0, 3).map((p, k): HeroSlide => ({
+      id: p.id,
+      eyebrow: p.tagline || "Featured",
+      lines: lineSplit(p.name),
+      text: p.description.length > 150 ? p.description.slice(0, 147) + "…" : p.description,
+      href: `/shop/${p.slug}`,
+      cta: "View this abaya",
+      price: money(p.price),
+      colors: [p.colors[0]?.hex ?? swatches[k], p.colors[1]?.hex ?? swatches[(k + 1) % 4]],
+      images: [p.images[0] ?? null, p.images[1] ?? p.images[0] ?? null],
+    })),
+  ];
+
   return (
     <>
-      <Hero />
+      <Hero slides={slides} />
+      <BigMarquee />
 
       {/* Category tiles */}
       <section className="container-x py-16">
-        <Reveal className="flex items-end justify-between gap-6">
-          <div>
-            <p className="eyebrow">Collections</p>
-            <h2 className="mt-3 font-display text-4xl font-medium md:text-5xl">Find your signature</h2>
-          </div>
-          <Link href="/shop" className="link-underline hidden text-sm font-medium md:block">View all →</Link>
-        </Reveal>
+        <SectionHead eyebrow="Collections" title="Find your signature" italicLast action={<Link href="/shop" className="link-underline hidden text-sm font-medium md:block">View all →</Link>} />
         <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
           {categories.map((c, i) => (
             <Reveal key={c.id} delay={i * 0.08}>
@@ -61,15 +76,10 @@ export default async function Home() {
       </section>
 
       {/* Featured */}
-      <section className="container-x py-12">
-        <Reveal>
-          <p className="eyebrow">Most loved</p>
-          <h2 className="mt-3 font-display text-4xl font-medium md:text-5xl">Featured abayas</h2>
-        </Reveal>
-        <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
-          {featured.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
-        </div>
-      </section>
+      {featured.length > 0 && <section className="container-x py-12">
+        <SectionHead eyebrow="Most loved" title="Featured abayas" italicLast />
+        <div className="mt-10"><Rail>{featured.map((p, i) => <div key={p.id} className="w-[64%] shrink-0 sm:w-[40%] lg:w-[calc(25%-1.15rem)]"><ProductCard product={p} index={i} /></div>)}</Rail></div>
+      </section>}
 
       {/* Craft story */}
       <section className="my-16 bg-fg text-bg">
@@ -98,16 +108,8 @@ export default async function Home() {
       {/* New arrivals */}
       {newest.length > 4 && (
         <section className="container-x py-12">
-          <Reveal className="flex items-end justify-between">
-            <div>
-              <p className="eyebrow">Just landed</p>
-              <h2 className="mt-3 font-display text-4xl font-medium md:text-5xl">New arrivals</h2>
-            </div>
-            <Link href="/shop" className="btn btn-ghost hidden md:inline-flex">Shop all</Link>
-          </Reveal>
-          <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-6">
-            {newest.slice(0, 8).map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
-          </div>
+          <SectionHead eyebrow="Just landed" title="New arrivals" action={<Link href="/shop" className="btn btn-ghost hidden md:inline-flex">Shop all</Link>} />
+          <div className="mt-10"><Rail>{newest.map((p, i) => <div key={p.id} className="w-[64%] shrink-0 sm:w-[40%] lg:w-[calc(25%-1.15rem)]"><ProductCard product={p} index={i} /></div>)}</Rail></div>
         </section>
       )}
 
@@ -126,19 +128,8 @@ export default async function Home() {
 
       {/* Reviews */}
       <section className="container-x py-12">
-        <Reveal className="text-center">
-          <p className="eyebrow">Kind words</p>
-          <h2 className="mt-3 font-display text-4xl font-medium md:text-5xl">Loved by our clients</h2>
-        </Reveal>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {reviews.map((r, i) => (
-            <Reveal key={r.n} delay={i * 0.1} className="card p-7">
-              <div className="text-gold" aria-label="5 stars">★★★★★</div>
-              <p className="mt-4 font-display text-xl leading-snug">&ldquo;{r.t}&rdquo;</p>
-              <p className="mt-5 text-xs font-semibold tracking-wide text-muted">— {r.n}</p>
-            </Reveal>
-          ))}
-        </div>
+        <SectionHead eyebrow="Kind words" title="Loved by our clients" italicLast center />
+        <div className="mt-10"><ReviewsCarousel /></div>
       </section>
 
       {/* WhatsApp CTA */}
