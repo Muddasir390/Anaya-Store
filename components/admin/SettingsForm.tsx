@@ -24,6 +24,8 @@ export default function SettingsForm({ s }: { s: SiteSettings }) {
         <div><label className="label" htmlFor="contact_email">Contact email</label><input id="contact_email" name="contact_email" type="email" defaultValue={s.contact_email} className="input" /></div>
         <div><label className="label" htmlFor="instagram">Instagram handle</label><input id="instagram" name="instagram" defaultValue={s.instagram} className="input" /></div>
       </div>
+      <div><label className="label" htmlFor="address">Store address</label><textarea id="address" name="address" rows={2} defaultValue={s.address} className="input" /></div>
+      <div><label className="label" htmlFor="phones">Phone numbers (comma separated)</label><input id="phones" name="phones" defaultValue={s.phones} placeholder="03001234567, 03111234567" className="input" /></div>
       {state?.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       {state?.ok && <p className="text-sm text-ok" aria-live="polite">Saved ✓</p>}
       <button disabled={pending} className="btn btn-gold">{pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save settings"}</button>

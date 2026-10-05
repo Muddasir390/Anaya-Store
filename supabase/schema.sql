@@ -238,12 +238,14 @@ create policy "product images admin delete" on storage.objects for delete
 
 insert into public.site_settings (key, value) values
   ('store_name',            'Anaya Abayas'),
-  ('whatsapp_number',       '923000000000'),
+  ('whatsapp_number',       '923042525475'),
   ('shipping_fee',          '250'),
   ('free_shipping_over',    '15000'),
   ('announcement',          'Complimentary shipping on orders over PKR 15,000 · Cash on delivery available'),
   ('contact_email',         'hello@anaya.store'),
-  ('instagram',             'anaya.abayas')
+  ('instagram',             'anaya.abayas'),
+  ('address',               'Near Darbar Noor Shah Bukhari, Ahmedpur East, District Bahawalpur, Punjab, Pakistan'),
+  ('phones',                '03154043456, 03042525475')
 on conflict (key) do nothing;
 
 -- ---------- Starter catalogue (optional — delete if you prefer to start empty)

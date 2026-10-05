@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Camera as Instagram, Mail, MessageCircle } from "lucide-react";
 import Logo from "./Logo";
-import { whatsappLink } from "@/lib/format";
+import { MapPin, Phone } from "lucide-react";
+import { prettyPhone, splitPhones, telHref, whatsappLink } from "@/lib/format";
 import type { SiteSettings } from "@/lib/types";
 
 export default function Footer({ settings }: { settings: SiteSettings }) {
@@ -13,6 +14,10 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
             Abayas designed with intention — modest, modern and made to be lived in. Crafted with care, delivered with love.
           </p>
+          <address className="mt-5 max-w-xs space-y-2 text-sm not-italic text-muted">
+            <p className="flex gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold" />{settings.address}</p>
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1"><Phone className="h-4 w-4 shrink-0 text-gold" />{splitPhones(settings.phones).map((p) => <a key={p} href={telHref(p)} className="transition hover:text-fg">{prettyPhone(p)}</a>)}</p>
+          </address>
           <div className="mt-6 flex gap-3">
             <a href={`https://instagram.com/${settings.instagram}`} target="_blank" rel="noreferrer" aria-label="Instagram" className="grid h-10 w-10 place-items-center rounded-full border border-line transition hover:border-gold hover:text-gold"><Instagram className="h-[18px] w-[18px]" /></a>
             <a href={whatsappLink(settings.whatsapp_number, "Hello Anaya, I have a question.")} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="grid h-10 w-10 place-items-center rounded-full border border-line transition hover:border-gold hover:text-gold"><MessageCircle className="h-[18px] w-[18px]" /></a>

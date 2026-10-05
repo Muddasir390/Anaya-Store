@@ -78,6 +78,8 @@ export type SiteSettings = {
   announcement: string;
   contact_email: string;
   instagram: string;
+  address: string;
+  phones: string; // comma-separated, local format
 };
 
 export type CartItem = {

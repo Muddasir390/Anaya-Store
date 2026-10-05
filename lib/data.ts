@@ -45,6 +45,8 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
     announcement: map.announcement ?? DEFAULT_SETTINGS.announcement,
     contact_email: map.contact_email || DEFAULT_SETTINGS.contact_email,
     instagram: map.instagram || DEFAULT_SETTINGS.instagram,
+    address: map.address || DEFAULT_SETTINGS.address,
+    phones: map.phones || DEFAULT_SETTINGS.phones,
   };
 });
 

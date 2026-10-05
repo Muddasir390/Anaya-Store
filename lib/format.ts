@@ -31,3 +31,15 @@ export const dateTime = (iso: string) =>
     timeStyle: "short",
     timeZone: "UTC",
   }) + " UTC";
+
+/** "03154043456" → "+92 315 4043456" (Pakistani mobile numbers); other formats pass through. */
+export function prettyPhone(p: string) {
+  const d = digitsOnly(p);
+  const m = d.match(/^0(3\d{2})(\d{7})$/) ?? d.match(/^92(3\d{2})(\d{7})$/);
+  return m ? `+92 ${m[1]} ${m[2]}` : p.trim();
+}
+export const telHref = (p: string) => {
+  const d = digitsOnly(p);
+  return `tel:${d.startsWith("0") ? "+92" + d.slice(1) : "+" + d}`;
+};
+export const splitPhones = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);

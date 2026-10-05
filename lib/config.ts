@@ -13,11 +13,13 @@ export const hasServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export const DEFAULT_SETTINGS = {
   store_name: "Anaya Abayas",
-  whatsapp_number: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "923000000000",
+  whatsapp_number: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "923042525475",
   shipping_fee: 250,
   free_shipping_over: 15000,
   announcement:
     "Complimentary shipping on orders over PKR 15,000 · Cash on delivery available",
   contact_email: "hello@anaya.store",
   instagram: "anaya.abayas",
+  address: "Near Darbar Noor Shah Bukhari, Ahmedpur East, District Bahawalpur, Punjab, Pakistan",
+  phones: "03154043456, 03042525475",
 };

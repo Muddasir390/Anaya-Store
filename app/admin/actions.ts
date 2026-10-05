@@ -177,7 +177,7 @@ export async function deleteCategory(id: string) {
 /* ---------- settings ---------- */
 export async function saveSettings(_p: FormState, fd: FormData): Promise<FormState> {
   const { supabase } = await requireAdmin();
-  const keys = ["store_name", "whatsapp_number", "shipping_fee", "free_shipping_over", "announcement", "contact_email", "instagram"];
+  const keys = ["store_name", "whatsapp_number", "shipping_fee", "free_shipping_over", "announcement", "contact_email", "instagram", "address", "phones"];
   const rows = keys.map((key) => ({ key, value: String(fd.get(key) ?? "").trim() }));
   const num = rows.filter((r) => ["shipping_fee", "free_shipping_over"].includes(r.key));
   if (num.some((r) => r.value === "" || Number.isNaN(Number(r.value)) || Number(r.value) < 0)) return { error: "Shipping values must be numbers" };
