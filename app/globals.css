@@ -132,9 +132,6 @@ body {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
 /* ---------- Extra motion ---------- */
-@keyframes marquee-rev { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-.marquee-track-rev { display: flex; width: max-content; animation: marquee-rev 46s linear infinite; }
-.outline-text { -webkit-text-stroke: 1px var(--fg); color: transparent; }
 @keyframes dust { 0% { transform: translateY(0) scale(1); opacity: 0; } 15% { opacity: .9; } 100% { transform: translateY(-140px) scale(.4); opacity: 0; } }
 .dust { position: absolute; border-radius: 999px; background: var(--gold); animation: dust linear infinite; pointer-events: none; }
 .snap-rail { scroll-snap-type: x mandatory; scroll-padding-inline: 1.25rem; }

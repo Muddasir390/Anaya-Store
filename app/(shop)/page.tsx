@@ -3,7 +3,6 @@ import { ArrowRight, Truck, Banknote, MessageCircle, RotateCcw, Sparkles } from 
 import Hero, { type HeroSlide } from "@/components/Hero";
 import Rail from "@/components/Rail";
 import ReviewsCarousel from "@/components/ReviewsCarousel";
-import BigMarquee from "@/components/BigMarquee";
 import { SectionHead } from "@/components/WordReveal";
 import { money } from "@/lib/format";
 import Reveal from "@/components/Reveal";
@@ -62,7 +61,6 @@ export default async function Home() {
   return (
     <>
       <Hero slides={slides} />
-      <BigMarquee />
 
       {/* Category tiles */}
       <section className="container-x py-16">
