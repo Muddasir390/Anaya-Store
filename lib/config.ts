@@ -22,4 +22,6 @@ export const DEFAULT_SETTINGS = {
   instagram: "anaya.abayas",
   address: "Near Darbar Noor Shah Bukhari, Ahmedpur East, District Bahawalpur, Punjab, Pakistan",
   phones: "03154043456, 03042525475",
+  announcement_ur: "PKR 15,000 سے زائد کے آرڈر پر شپنگ مفت · کیش آن ڈیلیوری دستیاب",
+  address_ur: "نزد دربار نور شاہ بخاری، احمد پور شرقیہ، ضلع بہاولپور، پنجاب، پاکستان",
 };

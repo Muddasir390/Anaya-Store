@@ -9,10 +9,14 @@ import AbayaArt from "./AbayaArt";
 import Image from "next/image";
 import { useStore } from "./Providers";
 import { discountPct, money, whatsappLink } from "@/lib/format";
+import { loc } from "@/lib/i18n";
+import { useT } from "./Locale";
 import type { Product } from "@/lib/types";
 
 export default function ProductDetail({ product, whatsapp }: { product: Product; whatsapp: string }) {
   const { add, wishlist, toggleWish, hydrated, setOpen } = useStore();
+  const { t, locale } = useT();
+  const name = loc(product, "name", locale);
   const [size, setSize] = useState<string | null>(null);
   const [colorIdx, setColorIdx] = useState(0);
   const [qty, setQty] = useState(1);
@@ -29,7 +33,7 @@ export default function ProductDetail({ product, whatsapp }: { product: Product;
 
   function addToBag(buyNow = false) {
     if (product.sizes.length && !size) {
-      setError("Please choose a size");
+      setError(t("pd.chooseSize"));
       return;
     }
     setError("");
@@ -39,7 +43,7 @@ export default function ProductDetail({ product, whatsapp }: { product: Product;
     if (buyNow) setOpen(false);
   }
 
-  const askText = `Hello Anaya! I'm interested in "${product.name}" (${money(product.price)}). ${typeof window !== "undefined" ? window.location.href : ""}`;
+  const askText = t("pd.waMsg", { name, price: money(product.price), url: typeof window !== "undefined" ? window.location.href : "" });
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
@@ -47,7 +51,7 @@ export default function ProductDetail({ product, whatsapp }: { product: Product;
       <div className="grid gap-3 md:grid-cols-[5rem_1fr]">
         <div className="order-2 flex gap-3 md:order-1 md:flex-col">
           {shots.map((s, i) => (
-            <button key={i} onClick={() => setShot(i)} aria-label={`View image ${i + 1}`} className={`relative aspect-[3/4] w-20 shrink-0 overflow-hidden rounded-xl border transition ${shot === i ? "border-gold ring-2 ring-gold/30" : "border-line opacity-70 hover:opacity-100"}`}>
+            <button key={i} onClick={() => setShot(i)} aria-label={t("pd.viewImage", { n: i + 1 })} className={`relative aspect-[3/4] w-20 shrink-0 overflow-hidden rounded-xl border transition ${shot === i ? "border-gold ring-2 ring-gold/30" : "border-line opacity-70 hover:opacity-100"}`}>
               {s ? <Image src={s} alt="" fill sizes="80px" className="object-cover" /> : <AbayaArt color={product.colors[i % Math.max(product.colors.length, 1)]?.hex} seed={product.id + i} className="absolute inset-0 h-full w-full" />}
             </button>
           ))}
@@ -62,23 +66,23 @@ export default function ProductDetail({ product, whatsapp }: { product: Product;
               )}
             </motion.div>
           </AnimatePresence>
-          {off > 0 && <span className="absolute left-4 top-4 rounded-full bg-gold px-3 py-1 text-xs font-bold uppercase tracking-widest text-on-gold">−{off}%</span>}
+          {off > 0 && <span dir="ltr" className="absolute start-4 top-4 rounded-full bg-gold px-3 py-1 text-xs font-bold uppercase tracking-widest text-on-gold">−{off}%</span>}
         </div>
       </div>
 
       {/* Info */}
       <div className="lg:pt-4">
-        <p className="eyebrow">{product.tagline || "Anaya"}</p>
-        <h1 className="mt-3 font-display text-5xl font-medium leading-[1.02] md:text-6xl">{product.name}</h1>
+        <p className="eyebrow">{loc(product, "tagline", locale) || "Anaya"}</p>
+        <h1 className="mt-3 font-display text-5xl font-medium leading-[1.02] md:text-6xl">{name}</h1>
         <div className="mt-5 flex items-baseline gap-3">
           <span className="text-3xl font-semibold">{money(product.price)}</span>
           {product.compare_at_price && product.compare_at_price > product.price && <span className="text-lg text-muted line-through">{money(product.compare_at_price)}</span>}
         </div>
-        <p className="mt-6 leading-relaxed text-muted">{product.description}</p>
+        <p className="mt-6 leading-relaxed text-muted">{loc(product, "description", locale)}</p>
 
         {product.colors.length > 0 && (
           <div className="mt-8">
-            <p className="label">Colour — <span className="text-fg">{color?.name}</span></p>
+            <p className="label">{t("pd.colour")} — <span className="text-fg">{color?.name}</span></p>
             <div className="flex gap-3">
               {product.colors.map((c, i) => (
                 <button key={c.name} onClick={() => setColorIdx(i)} aria-label={c.name} aria-pressed={i === colorIdx} className={`h-9 w-9 rounded-full border-2 p-0.5 transition ${i === colorIdx ? "border-gold" : "border-transparent hover:border-line"}`}>
@@ -92,8 +96,8 @@ export default function ProductDetail({ product, whatsapp }: { product: Product;
         {product.sizes.length > 0 && (
           <div className="mt-7">
             <div className="flex items-center justify-between">
-              <p className="label">Size</p>
-              <Link href="/size-guide" className="flex items-center gap-1 text-xs text-gold link-underline"><Ruler className="h-3.5 w-3.5" /> Size guide</Link>
+              <p className="label">{t("pd.size")}</p>
+              <Link href="/size-guide" className="flex items-center gap-1 text-xs text-gold link-underline"><Ruler className="h-3.5 w-3.5" /> {t("pd.sizeGuide")}</Link>
             </div>
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((s) => (
@@ -105,33 +109,33 @@ export default function ProductDetail({ product, whatsapp }: { product: Product;
         )}
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
-          <div className="flex items-center rounded-full border border-line">
-            <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease" className="grid h-12 w-12 place-items-center"><Minus className="h-4 w-4" /></button>
+          <div dir="ltr" className="flex items-center rounded-full border border-line">
+            <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label={t("pd.dec")} className="grid h-12 w-12 place-items-center"><Minus className="h-4 w-4" /></button>
             <span className="w-8 text-center font-semibold">{qty}</span>
-            <button onClick={() => setQty((q) => Math.min(Math.min(10, product.stock || 10), q + 1))} aria-label="Increase" className="grid h-12 w-12 place-items-center"><Plus className="h-4 w-4" /></button>
+            <button onClick={() => setQty((q) => Math.min(Math.min(10, product.stock || 10), q + 1))} aria-label={t("pd.inc")} className="grid h-12 w-12 place-items-center"><Plus className="h-4 w-4" /></button>
           </div>
           <button disabled={soldOut} onClick={() => addToBag()} className="btn btn-gold min-w-[12rem] flex-1 !py-4">
             <AnimatePresence mode="wait" initial={false}>
               <motion.span key={added ? "ok" : "add"} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }} className="inline-flex items-center gap-2">
-                {soldOut ? "Sold out" : added ? <><Check className="h-4 w-4" /> Added to bag</> : <><ShoppingBag className="h-4 w-4" /> Add to bag</>}
+                {soldOut ? t("pc.soldOut") : added ? <><Check className="h-4 w-4" /> {t("pd.added")}</> : <><ShoppingBag className="h-4 w-4" /> {t("pd.add")}</>}
               </motion.span>
             </AnimatePresence>
           </button>
-          <button onClick={() => toggleWish(product.id)} aria-label={liked ? "Remove from wishlist" : "Save to wishlist"} aria-pressed={liked} className="grid h-[3.2rem] w-[3.2rem] place-items-center rounded-full border border-line transition hover:border-gold">
+          <button onClick={() => toggleWish(product.id)} aria-label={liked ? t("pc.removeWish") : t("pd.saveWish")} aria-pressed={liked} className="grid h-[3.2rem] w-[3.2rem] place-items-center rounded-full border border-line transition hover:border-gold">
             <Heart className={`h-5 w-5 ${liked ? "fill-gold text-gold" : ""}`} />
           </button>
         </div>
-        {!soldOut && product.stock <= 5 && <p className="mt-3 text-sm text-danger">Only {product.stock} left — selling fast</p>}
+        {!soldOut && product.stock <= 5 && <p className="mt-3 text-sm text-danger">{t("pd.left", { n: product.stock })}</p>}
 
         <a href={whatsappLink(whatsapp, askText)} target="_blank" rel="noreferrer" className="btn btn-ghost mt-4 w-full">
-          <MessageCircle className="h-4 w-4" /> Ask about this abaya on WhatsApp
+          <MessageCircle className="h-4 w-4" /> {t("pd.askWa")}
         </a>
 
         <div className="mt-10 divide-y divide-line border-y border-line">
           {[
-            { id: "details", t: "Details & fabric", c: product.material ? `${product.material}.` : "Premium fabric, finished by hand." },
-            { id: "care", t: "Care", c: product.care || "Gentle wash or dry clean." },
-            { id: "ship", t: "Shipping & returns", c: "Delivery in 2–5 working days. Free shipping over the threshold shown at checkout. Size exchanges accepted within 7 days of delivery on unworn items with tags." },
+            { id: "details", t: t("pd.details"), c: loc(product, "material", locale) ? `${loc(product, "material", locale)}.` : t("pd.fabricFallback") },
+            { id: "care", t: t("pd.care"), c: loc(product, "care", locale) || t("pd.careFallback") },
+            { id: "ship", t: t("pd.ship"), c: t("pd.shipText") },
           ].map((a) => (
             <div key={a.id}>
               <button onClick={() => setOpenAcc(openAcc === a.id ? null : a.id)} aria-expanded={openAcc === a.id} className="flex w-full items-center justify-between py-4 text-left font-medium">

@@ -54,6 +54,20 @@ export default function ProductForm({ product, categories }: { product?: Product
           </div>
         </section>
 
+        <section className="card space-y-5 p-6">
+          <div>
+            <h2 className="font-display text-2xl font-semibold">Urdu translation <span className="text-sm font-normal text-muted">(optional)</span></h2>
+            <p className="mt-1 text-xs text-muted">Shown to customers who switch the site to Urdu. Leave blank to show the English text.</p>
+          </div>
+          <div><label className="label" htmlFor="name_ur">Name (اردو)</label><input id="name_ur" name="name_ur" dir="rtl" lang="ur" defaultValue={product?.name_ur} className="input text-lg" /></div>
+          <div><label className="label" htmlFor="tagline_ur">Tagline (اردو)</label><input id="tagline_ur" name="tagline_ur" dir="rtl" lang="ur" defaultValue={product?.tagline_ur} className="input" /></div>
+          <div><label className="label" htmlFor="description_ur">Description (اردو)</label><textarea id="description_ur" name="description_ur" rows={5} dir="rtl" lang="ur" defaultValue={product?.description_ur} className="input" /></div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div><label className="label" htmlFor="material_ur">Material (اردو)</label><input id="material_ur" name="material_ur" dir="rtl" lang="ur" defaultValue={product?.material_ur} className="input" /></div>
+            <div><label className="label" htmlFor="care_ur">Care (اردو)</label><input id="care_ur" name="care_ur" dir="rtl" lang="ur" defaultValue={product?.care_ur} className="input" /></div>
+          </div>
+        </section>
+
         <section className="card p-6">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-2xl font-semibold">Photos</h2>

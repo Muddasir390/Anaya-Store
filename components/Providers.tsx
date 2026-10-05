@@ -84,6 +84,7 @@ export default function Providers({ children }: { children: ReactNode }) {
           productId: p.id,
           slug: p.slug,
           name: p.name,
+          nameUr: p.name_ur || undefined,
           price: p.price,
           image: p.images[0] ?? null,
           size,

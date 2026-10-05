@@ -13,7 +13,9 @@ function CatForm({ c }: { c?: Category }) {
       <input name="name" required placeholder="Name" aria-label="Name" defaultValue={c?.name} className="input" />
       <input name="description" placeholder="Short description" aria-label="Description" defaultValue={c?.description} className="input" />
       <input name="sort_order" type="number" aria-label="Order" defaultValue={c?.sort_order ?? 0} className="input" />
-      <button disabled={pending} className="btn btn-ink !py-2.5 text-xs">{pending ? <Loader2 className="h-4 w-4 animate-spin" /> : c ? "Save" : "Add"}</button>
+      <input name="name_ur" dir="rtl" lang="ur" placeholder="نام (اردو)" aria-label="Name (Urdu)" defaultValue={c?.name_ur} className="input sm:col-span-2" />
+      <input name="description_ur" dir="rtl" lang="ur" placeholder="مختصر تفصیل (اردو)" aria-label="Description (Urdu)" defaultValue={c?.description_ur} className="input sm:col-span-2" />
+      <button disabled={pending} className="btn btn-ink !py-2.5 text-xs sm:col-span-4">{pending ? <Loader2 className="h-4 w-4 animate-spin" /> : c ? "Save" : "Add"}</button>
       {state?.error && <p role="alert" className="text-sm text-danger sm:col-span-4">{state.error}</p>}
     </form>
   );

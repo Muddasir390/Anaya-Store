@@ -47,6 +47,8 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
     instagram: map.instagram || DEFAULT_SETTINGS.instagram,
     address: map.address || DEFAULT_SETTINGS.address,
     phones: map.phones || DEFAULT_SETTINGS.phones,
+    announcement_ur: map.announcement_ur ?? DEFAULT_SETTINGS.announcement_ur,
+    address_ur: map.address_ur || DEFAULT_SETTINGS.address_ur,
   };
 });
 

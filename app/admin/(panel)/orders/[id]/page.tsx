@@ -57,6 +57,7 @@ export default async function OrderDetail({ params }: PageProps<"/admin/orders/[
             <h2 className="font-display text-2xl font-semibold">Customer</h2>
             <dl className="mt-4 space-y-3">
               <div><dt className="text-xs text-muted">Name</dt><dd className="font-medium">{o.customer_name}</dd></div>
+              <div><dt className="text-xs text-muted">Language</dt><dd className="font-medium">{o.lang === "ur" ? "اردو (Urdu)" : "English"}</dd></div>
               <div><dt className="text-xs text-muted">Phone / WhatsApp</dt><dd className="font-medium">{o.phone}</dd></div>
               {o.email && <div><dt className="text-xs text-muted">Email</dt><dd className="font-medium break-all">{o.email}</dd></div>}
               <div><dt className="text-xs text-muted">Address</dt><dd className="font-medium whitespace-pre-line">{o.address}, {o.city}</dd></div>

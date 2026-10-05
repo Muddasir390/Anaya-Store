@@ -1,7 +1,8 @@
 import type { Category, Product } from "./types";
+import { demoUrduCategories, demoUrduProducts } from "./demo-urdu";
 
 /** Shown automatically until Supabase env vars are configured. */
-export const demoCategories: Category[] = [
+const rawCategories: Category[] = [
   { id: "c1", name: "Everyday", slug: "everyday", description: "Effortless daily abayas in breathable crepe and nida.", image_url: null, sort_order: 1 },
   { id: "c2", name: "Occasion", slug: "occasion", description: "Statement pieces for Eid, weddings and evenings.", image_url: null, sort_order: 2 },
   { id: "c3", name: "Embroidered", slug: "embroidered", description: "Hand-finished detailing, thread by thread.", image_url: null, sort_order: 3 },
@@ -14,7 +15,7 @@ const base = {
   is_active: true,
 };
 
-export const demoProducts: Product[] = [
+const rawProducts: Product[] = [
   { ...base, id: "p1", slug: "noor-classic-black", name: "Noor Classic Black", tagline: "The everyday essential", description: "A timeless flowing abaya cut from featherlight crepe with a relaxed drape, sheer-sleeve detail and a hem that moves beautifully. Designed to be worn on repeat.", price: 8700, compare_at_price: 10500, category_id: "c1", colors: [{name: "Jet Black", hex: "#141414"}, {name: "Charcoal", hex: "#3d3d42"}], material: "Premium crepe · 100% polyester", stock: 24, is_featured: true, created_at: "2026-09-28T00:00:00Z", images: ["/demo/noor-classic-black.jpg", "/demo/noor-classic-black-detail.jpg"] },
   { ...base, id: "p2", slug: "layla-gold-cuff-open-front", name: "Layla Gold-Cuff Open Front", tagline: "Gold trim, quiet luxury", description: "A satin-finish open-front abaya with gold-embroidered cuffs and a luminous drape. Layer it over anything for an instant statement.", price: 13800, compare_at_price: null, category_id: "c4", colors: [{name: "Espresso", hex: "#3b2a26"}, {name: "Midnight", hex: "#1b2340"}], material: "Satin crepe · gold embroidered cuffs", stock: 12, is_featured: true, created_at: "2026-09-27T00:00:00Z", images: ["/demo/layla-gold-cuff-open-front.jpg", "/demo/layla-gold-cuff-open-front-detail.jpg"] },
   { ...base, id: "p3", slug: "zahra-rose-open-front", name: "Zahra Rose Open Front", tagline: "Flow in every step", description: "A soft rose open-front abaya with ruffled bell sleeves and a matching inner dress. Light, romantic and effortless to style.", price: 11400, compare_at_price: 12900, category_id: "c4", colors: [{name: "Rose", hex: "#d9808f"}, {name: "Ivory", hex: "#ece4d6"}], material: "Chiffon crepe", stock: 9, is_featured: true, created_at: "2026-09-26T00:00:00Z", images: ["/demo/zahra-rose-open-front.jpg", "/demo/zahra-rose-open-front-detail.jpg"] },
@@ -28,6 +29,9 @@ export const demoProducts: Product[] = [
   { ...base, id: "p11", slug: "sara-slate-swirl", name: "Sara Slate Swirl", tagline: "Soft grey, sculpted detail", description: "A slate-grey abaya with swirling black embroidery on the shoulders and layered chiffon sleeves.", price: 12300, compare_at_price: null, category_id: "c3", colors: [{name: "Slate", hex: "#4a4e55"}], material: "Crepe with chiffon sleeves", stock: 0, is_featured: false, created_at: "2026-09-18T00:00:00Z", images: ["/demo/sara-slate-swirl.jpg", "/demo/sara-slate-swirl-detail.jpg"] },
 ];
 
+export const demoCategories: Category[] = rawCategories.map((c) => ({ ...c, ...demoUrduCategories[c.slug] }));
+export const demoProducts: Product[] = rawProducts.map((p) => ({ ...p, ...demoUrduProducts[p.slug] }));
+
 export const demoSettings = {
   store_name: "Anaya Abayas",
   whatsapp_number: "923042525475",
@@ -36,6 +40,8 @@ export const demoSettings = {
   announcement: "Complimentary shipping on orders over PKR 15,000 · Cash on delivery available",
   contact_email: "hello@anaya.store",
   instagram: "anaya.abayas",
+  announcement_ur: "PKR 15,000 سے زائد کے آرڈر پر شپنگ مفت · کیش آن ڈیلیوری دستیاب",
+  address_ur: "نزد دربار نور شاہ بخاری، احمد پور شرقیہ، ضلع بہاولپور، پنجاب، پاکستان",
   address: "Near Darbar Noor Shah Bukhari, Ahmedpur East, District Bahawalpur, Punjab, Pakistan",
   phones: "03154043456, 03042525475",
 };

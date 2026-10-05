@@ -1,19 +1,24 @@
 import type { Metadata } from "next";
 import PageShell from "@/components/PageShell";
+import { getT } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: "Shipping, Returns & Policies" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
+  return { title: t("meta.policies") };
+}
 
-export default function Policies() {
+export default async function Policies() {
+  const { t } = await getT();
   return (
-    <PageShell eyebrow="The fine print" title="Policies">
-      <h2>Shipping</h2>
-      <p>Orders are dispatched within 1–2 working days and delivered in 2–5 working days. Shipping is free above the amount shown in your bag; otherwise a flat fee applies.</p>
-      <h2>Exchanges & returns</h2>
-      <p>Unworn items with tags can be exchanged within 7 days of delivery. Custom or altered pieces are final sale. Contact us on WhatsApp to start an exchange.</p>
-      <h2 id="privacy">Privacy</h2>
-      <p>We collect only the details needed to deliver and support your order (name, phone, address, optional email). We never sell your data. Contact us any time to have it removed.</p>
-      <h2 id="terms">Terms</h2>
-      <p>By placing an order you agree to provide accurate delivery information and to accept the order on delivery. Prices and availability may change without notice. <em>(Replace this placeholder text with your final legal terms.)</em></p>
+    <PageShell eyebrow={t("pol.eyebrow")} title={t("pol.title")}>
+      <h2>{t("pol.h1")}</h2>
+      <p>{t("pol.p1")}</p>
+      <h2>{t("pol.h2")}</h2>
+      <p>{t("pol.p2")}</p>
+      <h2 id="privacy">{t("pol.h3")}</h2>
+      <p>{t("pol.p3")}</p>
+      <h2 id="terms">{t("pol.h4")}</h2>
+      <p>{t("pol.p4")}</p>
     </PageShell>
   );
 }

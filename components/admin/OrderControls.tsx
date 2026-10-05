@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Loader2, MessageCircle } from "lucide-react";
 import { saveOrderNotes, updateOrderStatus } from "@/app/admin/actions";
 import { storeToCustomerMessage } from "@/lib/order-messages";
+import { makeT } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/format";
 import { ORDER_STATUSES, type Order, type OrderItem, type OrderStatus } from "@/lib/types";
 
@@ -13,7 +14,7 @@ export default function OrderControls({ order, items }: { order: Order; items: O
   const [msg, setMsg] = useState("");
   const [pending, start] = useTransition();
 
-  const wa = whatsappLink(order.phone, storeToCustomerMessage({ ...order, status }, items));
+  const wa = whatsappLink(order.phone, storeToCustomerMessage({ ...order, status }, items, makeT(order.lang === "ur" ? "ur" : "en")));
 
   function change(s: OrderStatus) {
     const prev = status;

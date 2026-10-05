@@ -3,6 +3,7 @@
 import { hasServiceRole, hasSupabase } from "@/lib/config";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { digitsOnly } from "@/lib/format";
+import { getT } from "@/lib/i18n/server";
 import type { OrderStatus } from "@/lib/types";
 
 export type TrackResult =
@@ -10,9 +11,10 @@ export type TrackResult =
   | { ok: false; error: string };
 
 export async function trackOrder(_prev: TrackResult | null, fd: FormData): Promise<TrackResult> {
+  const { t } = await getT();
   const number = String(fd.get("number") ?? "").trim().toUpperCase();
   const phone = digitsOnly(String(fd.get("phone") ?? ""));
-  if (!number || phone.length < 6) return { ok: false, error: "Enter your order number and phone number." };
+  if (!number || phone.length < 6) return { ok: false, error: t("tr.missing") };
 
   if (!hasSupabase || !hasServiceRole)
     return { ok: true, number, status: "shipped", total: 0, createdAt: new Date().toISOString(), items: [{ name: "Demo order (connect Supabase for real tracking)", quantity: 1, size: null }] };
@@ -26,7 +28,7 @@ export async function trackOrder(_prev: TrackResult | null, fd: FormData): Promi
   // Same message for "no such order" and "wrong phone" so numbers can't be probed.
   const stored = data ? digitsOnly(data.phone) : "";
   const match = stored && (stored.endsWith(phone.slice(-8)) || phone.endsWith(stored.slice(-8)));
-  if (!data || !match) return { ok: false, error: "We couldn't find an order with those details." };
+  if (!data || !match) return { ok: false, error: t("tr.notFound") };
 
   return {
     ok: true,

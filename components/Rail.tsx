@@ -2,9 +2,11 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "./Locale";
 
 /** Horizontal snap carousel with arrow buttons, drag-to-scroll and edge awareness. */
 export default function Rail({ children }: { children: React.ReactNode }) {
+  const { t } = useT();
   const ref = useRef<HTMLDivElement>(null);
   const [edge, setEdge] = useState({ start: true, end: false });
   const drag = useRef({ down: false, x: 0, left: 0, moved: false });
@@ -12,7 +14,10 @@ export default function Rail({ children }: { children: React.ReactNode }) {
   const measure = useCallback(() => {
     const el = ref.current;
     if (!el) return;
-    setEdge({ start: el.scrollLeft < 8, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 8 });
+    // scrollLeft is 0…-max in RTL; normalise so 0 is always the physical left edge.
+    const max = el.scrollWidth - el.clientWidth;
+    const x = el.scrollLeft < 0 ? el.scrollLeft + max : el.scrollLeft;
+    setEdge({ start: x < 8, end: x >= max - 8 });
   }, []);
 
   useEffect(() => {
@@ -57,7 +62,7 @@ export default function Rail({ children }: { children: React.ReactNode }) {
           key={side}
           onClick={() => by(side === "start" ? -1 : 1)}
           disabled={edge[side]}
-          aria-label={side === "start" ? "Scroll left" : "Scroll right"}
+          aria-label={side === "start" ? t("a.scrollLeft") : t("a.scrollRight")}
           className={`absolute top-[38%] hidden h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-line bg-bg/90 shadow-lg backdrop-blur transition hover:border-gold hover:text-gold disabled:pointer-events-none disabled:opacity-0 lg:grid ${side === "start" ? "-left-5" : "-right-5"}`}
         >
           {side === "start" ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}

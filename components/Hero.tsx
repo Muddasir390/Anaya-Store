@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import CoverFlow from "./CoverFlow";
 import Magnetic from "./Magnetic";
 import CountUp from "./CountUp";
+import { useT } from "./Locale";
 
 export type HeroSlide = {
   id: string;
@@ -26,6 +27,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function Hero({ slides }: { slides: HeroSlide[] }) {
   const ref = useRef<HTMLElement>(null);
+  const { t, rtl } = useT();
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const [dir, setDir] = useState(1);
@@ -83,11 +85,11 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
       <div className="container-x relative grid items-center gap-8 py-12 md:grid-cols-[1.05fr_1fr] md:py-20">
         <motion.div style={{ y: yText }} className="min-h-[26rem] md:min-h-[32rem]">
           <AnimatePresence mode="wait" custom={dir}>
-            <motion.div key={s.id} exit={{ opacity: 0, x: -40 * dir }} transition={{ duration: 0.3 }}>
-              <motion.p initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} className="eyebrow flex items-center gap-3">
+            <motion.div key={s.id} exit={{ opacity: 0, x: -40 * dir * (rtl ? -1 : 1) }} transition={{ duration: 0.3 }}>
+              <motion.p initial={{ opacity: 0, x: rtl ? 16 : -16 }} animate={{ opacity: 1, x: 0 }} className="eyebrow flex items-center gap-3">
                 <motion.span initial={{ width: 0 }} animate={{ width: 40 }} transition={{ duration: 0.8 }} className="block h-px bg-gold" /> {s.eyebrow}
               </motion.p>
-              <h1 className={`mt-5 font-display font-medium leading-[0.94] tracking-tight ${s.big ? "text-[clamp(3.4rem,9vw,7.2rem)]" : "text-[clamp(2.8rem,6.6vw,5.6rem)]"}`}>
+              <h1 className={`mt-5 font-display font-medium leading-[0.94] tracking-tight ${rtl ? (s.big ? "text-[clamp(2.6rem,6.4vw,4.8rem)]" : "text-[clamp(2.2rem,5vw,3.8rem)]") : s.big ? "text-[clamp(3.4rem,9vw,7.2rem)]" : "text-[clamp(2.8rem,6.6vw,5.6rem)]"}`}>
                 {s.lines.map((w, k) => (
                   <span key={w + k} className="block overflow-hidden pb-2">
                     <motion.span className={`block ${k === 1 || (!s.big && k === s.lines.length - 1) ? "italic text-gold" : ""}`} initial={{ y: "110%", rotate: 3 }} animate={{ y: 0, rotate: 0 }} transition={{ duration: 0.9, delay: 0.1 + k * 0.1, ease }}>
@@ -101,11 +103,11 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
                 <Magnetic>
                   <Link href={s.href} className="btn btn-gold group px-8 py-4">
                     {s.cta}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
                   </Link>
                 </Magnetic>
                 {s.price && <span className="font-display text-3xl font-semibold">{s.price}</span>}
-                {!s.price && <Link href="/about" className="btn btn-ghost px-7 py-4">Our story</Link>}
+                {!s.price && <Link href="/about" className="btn btn-ghost px-7 py-4">{t("hero.story")}</Link>}
               </motion.div>
             </motion.div>
           </AnimatePresence>
@@ -114,25 +116,25 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
           {n > 1 && (
             <div className="mt-10 flex items-center gap-5">
               <div className="flex gap-2">
-                <button onClick={() => go(i - 1, -1)} aria-label="Previous slide" className="grid h-11 w-11 place-items-center rounded-full border border-line transition hover:border-gold hover:text-gold"><ArrowLeft className="h-4 w-4" /></button>
-                <button onClick={() => go(i + 1, 1)} aria-label="Next slide" className="grid h-11 w-11 place-items-center rounded-full border border-line transition hover:border-gold hover:text-gold"><ArrowRight className="h-4 w-4" /></button>
+                <button onClick={() => go(i - 1, -1)} aria-label={t("a.prev")} className="grid h-11 w-11 place-items-center rounded-full border border-line transition hover:border-gold hover:text-gold"><ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /></button>
+                <button onClick={() => go(i + 1, 1)} aria-label={t("a.next")} className="grid h-11 w-11 place-items-center rounded-full border border-line transition hover:border-gold hover:text-gold"><ArrowRight className="h-4 w-4 rtl:-scale-x-100" /></button>
               </div>
               <div className="flex flex-1 max-w-[16rem] gap-2">
                 {slides.map((sl, k) => (
-                  <button key={sl.id} onClick={() => go(k)} aria-label={`Go to slide ${k + 1}`} className="relative h-1 flex-1 overflow-hidden rounded-full bg-line">
+                  <button key={sl.id} onClick={() => go(k)} aria-label={t("a.goto", { n: k + 1 })} className="relative h-1 flex-1 overflow-hidden rounded-full bg-line">
                     {k < i && <span className="absolute inset-0 bg-gold" />}
-                    {k === i && <motion.span key={`${i}-${running}`} className="absolute inset-0 origin-left bg-gold" initial={{ scaleX: running ? 0 : 1 }} animate={{ scaleX: 1 }} transition={{ duration: running ? 6.5 : 0, ease: "linear" }} />}
+                    {k === i && <motion.span key={`${i}-${running}`} className="absolute inset-0 origin-left rtl:origin-right bg-gold" initial={{ scaleX: running ? 0 : 1 }} animate={{ scaleX: 1 }} transition={{ duration: running ? 6.5 : 0, ease: "linear" }} />}
                   </button>
                 ))}
               </div>
-              <span className="font-display text-lg tabular-nums text-muted">{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</span>
+              <span dir="ltr" className="font-display text-lg tabular-nums text-muted">{String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</span>
             </div>
           )}
 
           <dl className="mt-10 flex gap-10 text-sm">
-            <div><dt className="font-display text-3xl font-semibold"><CountUp to={500} suffix="+" /></dt><dd className="text-xs text-muted">Happy clients</dd></div>
-            <div><dt className="font-display text-3xl font-semibold"><CountUp to={100} suffix="%" /></dt><dd className="text-xs text-muted">Premium fabric</dd></div>
-            <div><dt className="font-display text-3xl font-semibold">COD</dt><dd className="text-xs text-muted">Pay on delivery</dd></div>
+            <div><dt dir="ltr" className="font-display text-3xl font-semibold"><CountUp to={500} suffix="+" /></dt><dd className="text-xs text-muted">{t("hero.clients")}</dd></div>
+            <div><dt className="font-display text-3xl font-semibold"><CountUp to={100} suffix="%" /></dt><dd className="text-xs text-muted">{t("hero.fabric")}</dd></div>
+            <div><dt className="font-display text-3xl font-semibold">{t("hero.cod")}</dt><dd className="text-xs text-muted">{t("hero.codText")}</dd></div>
           </dl>
         </motion.div>
 
@@ -143,10 +145,10 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
           onDragEnd={(_, info) => { if (info.offset.x < -50) go(i + 1, 1); else if (info.offset.x > 50) go(i - 1, -1); }}
         >
           <CoverFlow slides={slides} index={i} onSelect={(k) => go(k)} />
-          <div className="floaty pointer-events-none absolute -top-2 right-0 z-20 grid h-24 w-24 place-items-center rounded-full border border-gold/60 bg-bg/70 text-center backdrop-blur md:h-28 md:w-28">
+          <div className="floaty pointer-events-none absolute -top-2 end-0 z-20 grid h-24 w-24 place-items-center rounded-full border border-gold/60 bg-bg/70 text-center backdrop-blur md:h-28 md:w-28">
             <div>
               <div className="font-arabic text-2xl leading-none text-gold md:text-3xl">عباية</div>
-              <div className="mt-1 text-[8px] font-bold uppercase tracking-[0.25em] md:text-[9px]">Handcrafted</div>
+              <div className="mt-1 text-[8px] font-bold uppercase tracking-[0.25em] md:text-[9px]">{t("hero.handcrafted")}</div>
             </div>
           </div>
         </motion.div>

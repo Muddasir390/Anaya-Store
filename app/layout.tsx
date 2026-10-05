@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Manrope, Amiri } from "next/font/google";
+import { Cormorant_Garamond, Manrope, Amiri, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import { SITE_URL } from "@/lib/config";
@@ -11,6 +11,7 @@ const cormorant = Cormorant_Garamond({
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
 });
+const naskh = Noto_Naskh_Arabic({ variable: "--font-naskh", subsets: ["arabic"], weight: ["400", "500", "600", "700"], display: "swap" });
 const amiri = Amiri({ variable: "--font-amiri", subsets: ["arabic"], weight: ["400", "700"] });
 
 export const metadata: Metadata = {
@@ -40,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       data-theme="light"
       suppressHydrationWarning
-      className={`${manrope.variable} ${cormorant.variable} ${amiri.variable}`}
+      className={`${manrope.variable} ${cormorant.variable} ${amiri.variable} ${naskh.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

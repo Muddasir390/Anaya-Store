@@ -77,6 +77,11 @@ const ProductSchema = z.object({
   stock: z.coerce.number().int().min(0),
   material: z.string().trim().max(200).default(""),
   care: z.string().trim().max(500).default(""),
+  name_ur: z.string().trim().max(160).default(""),
+  tagline_ur: z.string().trim().max(160).default(""),
+  description_ur: z.string().trim().max(4000).default(""),
+  material_ur: z.string().trim().max(240).default(""),
+  care_ur: z.string().trim().max(600).default(""),
   sizes: z.string().default(""),
   colors: z.string().default("[]"),
   images: z.string().default("[]"),
@@ -111,6 +116,11 @@ export async function saveProduct(_p: FormState, fd: FormData): Promise<FormStat
     stock: d.stock,
     material: d.material,
     care: d.care,
+    name_ur: d.name_ur,
+    tagline_ur: d.tagline_ur,
+    description_ur: d.description_ur,
+    material_ur: d.material_ur,
+    care_ur: d.care_ur,
     sizes: d.sizes.split(",").map((s) => s.trim()).filter(Boolean),
     colors,
     images,
@@ -158,6 +168,8 @@ export async function saveCategory(_p: FormState, fd: FormData): Promise<FormSta
     name,
     slug: slugify(name),
     description: String(fd.get("description") ?? "").trim(),
+    name_ur: String(fd.get("name_ur") ?? "").trim(),
+    description_ur: String(fd.get("description_ur") ?? "").trim(),
     sort_order: Number(fd.get("sort_order") ?? 0) || 0,
   };
   const { error } = id ? await supabase.from("categories").update(row).eq("id", id) : await supabase.from("categories").insert(row);
@@ -177,7 +189,7 @@ export async function deleteCategory(id: string) {
 /* ---------- settings ---------- */
 export async function saveSettings(_p: FormState, fd: FormData): Promise<FormState> {
   const { supabase } = await requireAdmin();
-  const keys = ["store_name", "whatsapp_number", "shipping_fee", "free_shipping_over", "announcement", "contact_email", "instagram", "address", "phones"];
+  const keys = ["store_name", "whatsapp_number", "shipping_fee", "free_shipping_over", "announcement", "contact_email", "instagram", "address", "phones", "announcement_ur", "address_ur"];
   const rows = keys.map((key) => ({ key, value: String(fd.get(key) ?? "").trim() }));
   const num = rows.filter((r) => ["shipping_fee", "free_shipping_over"].includes(r.key));
   if (num.some((r) => r.value === "" || Number.isNaN(Number(r.value)) || Number(r.value) < 0)) return { error: "Shipping values must be numbers" };

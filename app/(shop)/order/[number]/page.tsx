@@ -4,9 +4,13 @@ import { hasServiceRole, hasSupabase } from "@/lib/config";
 import { createAdminClient } from "@/lib/supabase/admin";
 import OrderConfirmation from "@/components/OrderConfirmation";
 import type { Order } from "@/lib/types";
+import { getT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "Order confirmed", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
+  return { title: t("meta.order"), robots: { index: false } };
+}
 
 export default async function OrderPage({ params, searchParams }: PageProps<"/order/[number]">) {
   const { number } = await params;

@@ -20,11 +20,13 @@ export default function SettingsForm({ s }: { s: SiteSettings }) {
         <div><label className="label" htmlFor="free_shipping_over">Free shipping over</label><input id="free_shipping_over" name="free_shipping_over" type="number" min="0" step="0.01" defaultValue={s.free_shipping_over} className="input" /></div>
       </div>
       <div><label className="label" htmlFor="announcement">Announcement bar text (blank to hide)</label><input id="announcement" name="announcement" defaultValue={s.announcement} className="input" /></div>
+      <div><label className="label" htmlFor="announcement_ur">Announcement bar (اردو)</label><input id="announcement_ur" name="announcement_ur" dir="rtl" lang="ur" defaultValue={s.announcement_ur} className="input" /></div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div><label className="label" htmlFor="contact_email">Contact email</label><input id="contact_email" name="contact_email" type="email" defaultValue={s.contact_email} className="input" /></div>
         <div><label className="label" htmlFor="instagram">Instagram handle</label><input id="instagram" name="instagram" defaultValue={s.instagram} className="input" /></div>
       </div>
       <div><label className="label" htmlFor="address">Store address</label><textarea id="address" name="address" rows={2} defaultValue={s.address} className="input" /></div>
+      <div><label className="label" htmlFor="address_ur">Store address (اردو)</label><textarea id="address_ur" name="address_ur" rows={2} dir="rtl" lang="ur" defaultValue={s.address_ur} className="input" /></div>
       <div><label className="label" htmlFor="phones">Phone numbers (comma separated)</label><input id="phones" name="phones" defaultValue={s.phones} placeholder="03001234567, 03111234567" className="input" /></div>
       {state?.error && <p role="alert" className="text-sm text-danger">{state.error}</p>}
       {state?.ok && <p className="text-sm text-ok" aria-live="polite">Saved ✓</p>}

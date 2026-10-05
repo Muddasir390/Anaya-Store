@@ -2,8 +2,10 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useCallback } from "react";
+import { useT } from "./Locale";
 
 export default function ThemeToggle() {
+  const { t } = useT();
   const toggle = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const root = document.documentElement;
     const next = root.dataset.theme === "dark" ? "light" : "dark";
@@ -34,7 +36,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      aria-label="Toggle light / dark theme"
+      aria-label={t("a.theme")}
       className="relative grid h-10 w-10 place-items-center rounded-full border border-line text-fg transition hover:border-gold hover:text-gold"
     >
       <Sun className="h-[18px] w-[18px] scale-100 rotate-0 transition-all duration-500 [[data-theme=dark]_&]:scale-0 [[data-theme=dark]_&]:-rotate-90" />

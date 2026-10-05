@@ -89,6 +89,17 @@ create table if not exists public.site_settings (
   value text not null default ''
 );
 
+
+-- ---------- Urdu translations (added after first release; safe to re-run) ----
+alter table public.products   add column if not exists name_ur        text not null default '';
+alter table public.products   add column if not exists tagline_ur     text not null default '';
+alter table public.products   add column if not exists description_ur text not null default '';
+alter table public.products   add column if not exists material_ur    text not null default '';
+alter table public.products   add column if not exists care_ur        text not null default '';
+alter table public.categories add column if not exists name_ur        text not null default '';
+alter table public.categories add column if not exists description_ur text not null default '';
+alter table public.orders     add column if not exists lang           text not null default 'en';
+
 -- ---------- Helper: is the current user an admin? ---------------------
 
 create or replace function public.is_admin()
@@ -149,10 +160,11 @@ begin
 
   v_ship := case when v_subtotal >= v_free then 0 else v_fee end;
 
-  insert into public.orders (customer_name, phone, email, address, city, notes, payment_method, subtotal, shipping, total)
+  insert into public.orders (customer_name, phone, email, address, city, notes, payment_method, subtotal, shipping, total, lang)
   values (p_customer->>'name', p_customer->>'phone', nullif(p_customer->>'email',''),
           p_customer->>'address', p_customer->>'city', nullif(p_customer->>'notes',''),
-          coalesce(p_customer->>'payment_method','cod'), v_subtotal, v_ship, v_subtotal + v_ship)
+          coalesce(p_customer->>'payment_method','cod'), v_subtotal, v_ship, v_subtotal + v_ship,
+          case when p_customer->>'lang' = 'ur' then 'ur' else 'en' end)
   returning * into v_order;
 
   -- pass 2: write lines + decrement stock
@@ -245,7 +257,9 @@ insert into public.site_settings (key, value) values
   ('contact_email',         'hello@anaya.store'),
   ('instagram',             'anaya.abayas'),
   ('address',               'Near Darbar Noor Shah Bukhari, Ahmedpur East, District Bahawalpur, Punjab, Pakistan'),
-  ('phones',                '03154043456, 03042525475')
+  ('phones',                '03154043456, 03042525475'),
+  ('announcement_ur',       'PKR 15,000 سے زائد کے آرڈر پر شپنگ مفت · کیش آن ڈیلیوری دستیاب'),
+  ('address_ur',            'نزد دربار نور شاہ بخاری، احمد پور شرقیہ، ضلع بہاولپور، پنجاب، پاکستان')
 on conflict (key) do nothing;
 
 -- ---------- Starter catalogue (optional — delete if you prefer to start empty)

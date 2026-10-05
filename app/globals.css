@@ -136,3 +136,19 @@ body {
 .dust { position: absolute; border-radius: 999px; background: var(--gold); animation: dust linear infinite; pointer-events: none; }
 .snap-rail { scroll-snap-type: x mandatory; scroll-padding-inline: 1.25rem; }
 .snap-rail > * { scroll-snap-align: start; }
+
+/* ---------- Urdu / right-to-left ---------- */
+.ur { font-family: var(--font-naskh), var(--font-sans), sans-serif; line-height: 1.85; }
+.ur .font-display, .ur h1, .ur h2, .ur h3 { font-family: var(--font-naskh), var(--font-display), serif; font-weight: 600; }
+.ur h1 { line-height: 1.4 !important; }
+.ur h2, .ur h3, .ur .font-display { line-height: 1.5 !important; }
+.ur *, .ur *::before, .ur *::after { letter-spacing: 0 !important; }
+.ur .italic { font-style: normal; }
+.ur .uppercase { text-transform: none; }
+.ur .eyebrow { text-transform: none; font-size: 0.9rem; }
+.ur .btn, .ur .label { letter-spacing: 0; }
+.ur .label { font-size: .85rem; }
+@keyframes marquee-rtl { to { transform: translateX(50%); } }
+[dir="rtl"] .marquee-track { animation-name: marquee-rtl; }
+[dir="rtl"] .link-underline::after { transform-origin: left; }
+[dir="rtl"] .link-underline:hover::after, [dir="rtl"] .link-underline[data-active="true"]::after { transform-origin: right; }

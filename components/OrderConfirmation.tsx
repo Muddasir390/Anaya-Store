@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { Check, MessageCircle } from "lucide-react";
 import { customerToStoreMessage } from "@/lib/order-messages";
 import { money, whatsappLink } from "@/lib/format";
+import { useT } from "./Locale";
 import type { Order } from "@/lib/types";
 
 type Snapshot = {
@@ -18,6 +19,7 @@ type Snapshot = {
 
 export default function OrderConfirmation({ number, order, whatsapp }: { number: string; order: Order | null; whatsapp: string }) {
   const [snap, setSnap] = useState<Snapshot | null>(null);
+  const { t, locale } = useT();
 
   useEffect(() => {
     try {
@@ -36,6 +38,7 @@ export default function OrderConfirmation({ number, order, whatsapp }: { number:
   const message = customerToStoreMessage(
     { order_number: number, customer_name: who, total, address: order?.address ?? snap?.address ?? "", city: order?.city ?? snap?.city ?? "" },
     lines ?? [],
+    t,
   );
 
   return (
@@ -44,35 +47,35 @@ export default function OrderConfirmation({ number, order, whatsapp }: { number:
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 260, damping: 14 }} className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gold text-on-gold">
           <motion.span initial={{ pathLength: 0 }}><Check className="h-10 w-10" strokeWidth={2.5} /></motion.span>
         </motion.div>
-        <p className="eyebrow mt-8">Thank you{who ? `, ${who.split(" ")[0]}` : ""}</p>
-        <h1 className="mt-3 font-display text-5xl font-medium md:text-6xl">Order received</h1>
+        <p className="eyebrow mt-8">{t("oc.thanks")}{who ? `${locale === "ur" ? "،" : ","} ${who.split(" ")[0]}` : ""}</p>
+        <h1 className="mt-3 font-display text-5xl font-medium md:text-6xl">{t("oc.title")}</h1>
         <p className="mt-4 text-muted">
-          Your order number is <b className="text-fg">{number}</b>. One last step — tap below to confirm it with us on WhatsApp so we can start preparing your abaya right away.
+          {t("oc.text", { n: number })}
         </p>
 
         <a href={whatsappLink(whatsapp, message)} target="_blank" rel="noreferrer" className="btn btn-wa mt-8 w-full !py-4 text-base sm:w-auto sm:px-10">
-          <MessageCircle className="h-5 w-5" /> Confirm on WhatsApp
+          <MessageCircle className="h-5 w-5" /> {t("oc.confirm")}
         </a>
 
         {lines && (
-          <div className="card mt-10 p-6 text-left">
+          <div className="card mt-10 p-6 text-start">
             <ul className="space-y-2 text-sm">
               {lines.map((l, i) => (
                 <li key={i} className="flex justify-between gap-4">
-                  <span>{l.name} ×{l.quantity}{l.size ? ` · Size ${l.size}` : ""}{l.color ? ` · ${l.color}` : ""}</span>
+                  <span>{l.name} ×{l.quantity}{l.size ? ` · ${t("cart.size", { s: l.size })}` : ""}{l.color ? ` · ${l.color}` : ""}</span>
                   <span className="font-medium">{money(l.price * l.quantity)}</span>
                 </li>
               ))}
             </ul>
-            <div className="mt-4 flex justify-between border-t border-line pt-4 font-semibold"><span>Total (cash on delivery)</span><span>{money(total)}</span></div>
+            <div className="mt-4 flex justify-between border-t border-line pt-4 font-semibold"><span>{t("oc.total")}</span><span>{money(total)}</span></div>
           </div>
         )}
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/track" className="btn btn-ghost">Track my order</Link>
-          <Link href="/shop" className="btn btn-ink">Continue shopping</Link>
+          <Link href="/track" className="btn btn-ghost">{t("oc.track")}</Link>
+          <Link href="/shop" className="btn btn-ink">{t("oc.continue")}</Link>
         </div>
-        {number.startsWith("DEMO") && <p className="mt-6 text-xs text-muted">Preview mode — connect Supabase to save real orders.</p>}
+        {number.startsWith("DEMO") && <p className="mt-6 text-xs text-muted">{t("oc.demo")}</p>}
       </div>
     </div>
   );

@@ -9,10 +9,12 @@ import AbayaArt from "./AbayaArt";
 import Image from "next/image";
 import { placeOrder } from "@/app/(shop)/checkout/actions";
 import { money } from "@/lib/format";
+import { useT } from "./Locale";
 import type { SiteSettings } from "@/lib/types";
 
 export default function CheckoutForm({ settings }: { settings: SiteSettings }) {
   const { items, subtotal, clear, hydrated } = useStore();
+  const { t, locale } = useT();
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState("");
@@ -25,8 +27,8 @@ export default function CheckoutForm({ settings }: { settings: SiteSettings }) {
   if (items.length === 0)
     return (
       <div className="py-24 text-center">
-        <p className="font-display text-4xl">Your bag is empty</p>
-        <Link href="/shop" className="btn btn-ink mt-6">Browse abayas</Link>
+        <p className="font-display text-4xl">{t("co.empty")}</p>
+        <Link href="/shop" className="btn btn-ink mt-6">{t("co.browse")}</Link>
       </div>
     );
 
@@ -71,33 +73,33 @@ export default function CheckoutForm({ settings }: { settings: SiteSettings }) {
     <form onSubmit={submit} className="mt-10 grid gap-10 lg:grid-cols-[1.3fr_1fr]">
       <div className="space-y-8">
         <section className="card space-y-5 p-6 md:p-8">
-          <h2 className="font-display text-2xl font-semibold">Delivery details</h2>
+          <h2 className="font-display text-2xl font-semibold">{t("co.delivery")}</h2>
           <div className="grid gap-5 md:grid-cols-2">
-            <div><label className="label" htmlFor="name">Full name *</label><input id="name" name="name" required autoComplete="name" className="input" />{err("name")}</div>
-            <div><label className="label" htmlFor="phone">WhatsApp / phone *</label><input id="phone" name="phone" required type="tel" autoComplete="tel" placeholder="+92 300 0000000" className="input" />{err("phone")}</div>
+            <div><label className="label" htmlFor="name">{t("co.name")}</label><input id="name" name="name" required autoComplete="name" className="input" />{err("name")}</div>
+            <div><label className="label" htmlFor="phone">{t("co.phone")}</label><input id="phone" name="phone" required type="tel" dir="ltr" autoComplete="tel" placeholder="+92 300 0000000" className="input rtl:text-right" />{err("phone")}</div>
           </div>
-          <div><label className="label" htmlFor="email">Email (optional)</label><input id="email" name="email" type="email" autoComplete="email" className="input" />{err("email")}</div>
-          <div><label className="label" htmlFor="address">Full address *</label><textarea id="address" name="address" required rows={3} autoComplete="street-address" className="input" />{err("address")}</div>
-          <div><label className="label" htmlFor="city">City *</label><input id="city" name="city" required autoComplete="address-level2" className="input" />{err("city")}</div>
-          <div><label className="label" htmlFor="notes">Order notes (optional)</label><textarea id="notes" name="notes" rows={2} placeholder="Height, length preference, delivery instructions…" className="input" /></div>
+          <div><label className="label" htmlFor="email">{t("co.email")}</label><input id="email" name="email" type="email" dir="ltr" autoComplete="email" className="input rtl:text-right" />{err("email")}</div>
+          <div><label className="label" htmlFor="address">{t("co.address")}</label><textarea id="address" name="address" required rows={3} autoComplete="street-address" className="input" />{err("address")}</div>
+          <div><label className="label" htmlFor="city">{t("co.city")}</label><input id="city" name="city" required autoComplete="address-level2" className="input" />{err("city")}</div>
+          <div><label className="label" htmlFor="notes">{t("co.notes")}</label><textarea id="notes" name="notes" rows={2} placeholder={t("co.notesPh")} className="input" /></div>
           {/* honeypot */}
-          <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] h-0 w-0 opacity-0" />
+          <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -start-[9999px] h-0 w-0 opacity-0" />
         </section>
 
         <section className="card p-6 md:p-8">
-          <h2 className="font-display text-2xl font-semibold">Payment</h2>
+          <h2 className="font-display text-2xl font-semibold">{t("co.payment")}</h2>
           <div className="mt-4 flex items-center gap-4 rounded-2xl border border-gold bg-gold-soft/40 p-4">
             <Banknote className="h-6 w-6 text-gold" />
             <div>
-              <p className="font-semibold">Cash on delivery</p>
-              <p className="text-xs text-muted">Pay in cash when your abaya arrives. We&apos;ll also confirm your order on WhatsApp.</p>
+              <p className="font-semibold">{t("co.cod")}</p>
+              <p className="text-xs text-muted">{t("co.codText")}</p>
             </div>
           </div>
         </section>
       </div>
 
       <aside className="card h-fit space-y-5 p-6 md:p-8 lg:sticky lg:top-28">
-        <h2 className="font-display text-2xl font-semibold">Order summary</h2>
+        <h2 className="font-display text-2xl font-semibold">{t("co.summary")}</h2>
         <ul className="space-y-4">
           {items.map((i) => (
             <li key={i.key} className="flex gap-3">
@@ -105,24 +107,24 @@ export default function CheckoutForm({ settings }: { settings: SiteSettings }) {
                 {i.image ? <Image src={i.image} alt="" fill sizes="64px" className="object-cover" /> : <AbayaArt color={i.color?.hex} seed={i.productId} className="absolute inset-0 h-full w-full" />}
               </div>
               <div className="min-w-0 flex-1 text-sm">
-                <p className="font-display text-lg font-semibold leading-tight">{i.name}</p>
-                <p className="text-xs text-muted">{[i.size && `Size ${i.size}`, i.color?.name, `Qty ${i.quantity}`].filter(Boolean).join(" · ")}</p>
+                <p className="font-display text-lg font-semibold leading-tight">{locale === "ur" && i.nameUr ? i.nameUr : i.name}</p>
+                <p className="text-xs text-muted">{[i.size && t("cart.size", { s: i.size }), i.color?.name, t("cart.qty", { n: i.quantity })].filter(Boolean).join(" · ")}</p>
               </div>
               <span className="text-sm font-semibold">{money(i.price * i.quantity)}</span>
             </li>
           ))}
         </ul>
         <div className="space-y-2 border-t border-line pt-4 text-sm">
-          <div className="flex justify-between"><span className="text-muted">Subtotal</span><span>{money(subtotal)}</span></div>
-          <div className="flex justify-between"><span className="text-muted">Shipping</span><span>{shipping === 0 ? "Free" : money(shipping)}</span></div>
-          <div className="flex justify-between border-t border-line pt-3 text-lg font-semibold"><span>Total</span><span>{money(total)}</span></div>
+          <div className="flex justify-between"><span className="text-muted">{t("co.subtotal")}</span><span>{money(subtotal)}</span></div>
+          <div className="flex justify-between"><span className="text-muted">{t("co.shipping")}</span><span>{shipping === 0 ? t("co.free") : money(shipping)}</span></div>
+          <div className="flex justify-between border-t border-line pt-3 text-lg font-semibold"><span>{t("co.total")}</span><span>{money(total)}</span></div>
         </div>
         {error && <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">{error}</p>}
         <button disabled={pending} className="btn btn-gold w-full !py-4">
-          {pending ? <><Loader2 className="h-4 w-4 animate-spin" /> Placing order…</> : "Place order"}
+          {pending ? <><Loader2 className="h-4 w-4 animate-spin" /> {t("co.placing")}</> : t("co.place")}
         </button>
-        <p className="flex items-start gap-2 text-xs text-muted"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold" /> Your details are used only to deliver your order and contact you on WhatsApp.</p>
-        <p className="flex items-start gap-2 text-xs text-muted"><MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#1fa855]" /> After ordering you&apos;ll be able to confirm instantly with us on WhatsApp.</p>
+        <p className="flex items-start gap-2 text-xs text-muted"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-gold" /> {t("co.privacy")}</p>
+        <p className="flex items-start gap-2 text-xs text-muted"><MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#1fa855]" /> {t("co.waNote")}</p>
       </aside>
     </form>
   );

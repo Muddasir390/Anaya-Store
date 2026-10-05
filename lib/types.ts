@@ -5,6 +5,8 @@ export type Category = {
   name: string;
   slug: string;
   description: string;
+  name_ur?: string;
+  description_ur?: string;
   image_url: string | null;
   sort_order: number;
 };
@@ -23,6 +25,11 @@ export type Product = {
   colors: ColorOption[];
   material: string;
   care: string;
+  name_ur?: string;
+  tagline_ur?: string;
+  description_ur?: string;
+  material_ur?: string;
+  care_ur?: string;
   stock: number;
   is_active: boolean;
   is_featured: boolean;
@@ -61,6 +68,7 @@ export type Order = {
   address: string;
   city: string;
   notes: string | null;
+  lang?: string;
   payment_method: string;
   subtotal: number;
   shipping: number;
@@ -80,6 +88,8 @@ export type SiteSettings = {
   instagram: string;
   address: string;
   phones: string; // comma-separated, local format
+  announcement_ur: string;
+  address_ur: string;
 };
 
 export type CartItem = {
@@ -87,6 +97,7 @@ export type CartItem = {
   productId: string;
   slug: string;
   name: string;
+  nameUr?: string;
   price: number;
   image: string | null;
   size: string | null;
