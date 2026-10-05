@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { AnimatePresence, motion, useMotionValue, useScroll, useTransform } from "motion/react";
+import { AnimatePresence, motion, useInView, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import AbayaArt from "./AbayaArt";
+import CoverFlow from "./CoverFlow";
 import Magnetic from "./Magnetic";
 import CountUp from "./CountUp";
 
@@ -17,6 +16,7 @@ export type HeroSlide = {
   href: string;
   cta: string;
   price?: string;
+  caption?: string;
   colors: [string, string];
   images: [string | null, string | null];
   big?: boolean;
@@ -31,6 +31,14 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
   const [dir, setDir] = useState(1);
   const n = slides.length;
   const s = slides[i];
+  const inView = useInView(ref, { amount: 0.25 });
+  const [tabVisible, setTabVisible] = useState(true);
+  useEffect(() => {
+    const on = () => setTabVisible(!document.hidden);
+    document.addEventListener("visibilitychange", on);
+    return () => document.removeEventListener("visibilitychange", on);
+  }, []);
+  const running = !paused && inView && tabVisible;
 
   const go = useCallback((to: number, d?: number) => {
     setDir(d ?? (to > i ? 1 : -1));
@@ -38,25 +46,17 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
   }, [i, n]);
 
   useEffect(() => {
-    if (paused || n < 2) return;
+    if (!running || n < 2) return;
     const t = setTimeout(() => go(i + 1, 1), 6500);
     return () => clearTimeout(t);
-  }, [i, paused, n, go]);
+  }, [i, running, n, go]);
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yA = useTransform(scrollYProgress, [0, 1], [0, -90]);
-  const yB = useTransform(scrollYProgress, [0, 1], [0, 60]);
   const yText = useTransform(scrollYProgress, [0, 1], [0, 70]);
 
   // cursor glow
-  const mx = useMotionValue(30);
-  const my = useMotionValue(30);
-  const glow = useTransform([mx, my], ([x, y]) => `radial-gradient(520px circle at ${x}% ${y}%, color-mix(in srgb, var(--gold) 20%, transparent), transparent 60%)`);
-
-  const card = (idx: 0 | 1) => {
-    const img = s.images[idx];
-    return img ? <Image src={img} alt="" fill sizes="(min-width:768px) 22vw, 50vw" className="object-cover" priority={i === 0} /> : <AbayaArt color={s.colors[idx]} seed={`${s.id}${idx}`} className="h-full w-full" />;
-  };
+  const gx = useSpring(useMotionValue(200), { stiffness: 60, damping: 18 });
+  const gy = useSpring(useMotionValue(200), { stiffness: 60, damping: 18 });
 
   return (
     <section
@@ -64,17 +64,18 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
       className="relative overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onMouseMove={(e) => {
+      onPointerMove={(e) => {
+        if (e.pointerType !== "mouse") return;
         const r = e.currentTarget.getBoundingClientRect();
-        mx.set(((e.clientX - r.left) / r.width) * 100);
-        my.set(((e.clientY - r.top) / r.height) * 100);
+        gx.set(e.clientX - r.left);
+        gy.set(e.clientY - r.top);
       }}
     >
-      <motion.div style={{ background: glow }} className="pointer-events-none absolute inset-0 hidden md:block" />
+      <motion.div aria-hidden style={{ x: gx, y: gy, willChange: "transform" }} className="pointer-events-none absolute left-0 top-0 hidden h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--gold)_22%,transparent),transparent_65%)] md:block" />
       <div className="pointer-events-none absolute -left-40 top-0 h-[34rem] w-[34rem] rounded-full bg-gold/15 blur-3xl" />
       {/* gold dust */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        {Array.from({ length: 16 }, (_, k) => (
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden style={{ display: inView ? undefined : "none" }}>
+        {Array.from({ length: 12 }, (_, k) => (
           <span key={k} className="dust" style={{ left: `${(k * 37 + 11) % 100}%`, bottom: `${(k * 23) % 40}%`, width: 2 + (k % 3), height: 2 + (k % 3), animationDuration: `${6 + (k % 5) * 1.6}s`, animationDelay: `${(k % 7) * 0.9}s` }} />
         ))}
       </div>
@@ -120,7 +121,7 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
                 {slides.map((sl, k) => (
                   <button key={sl.id} onClick={() => go(k)} aria-label={`Go to slide ${k + 1}`} className="relative h-1 flex-1 overflow-hidden rounded-full bg-line">
                     {k < i && <span className="absolute inset-0 bg-gold" />}
-                    {k === i && <motion.span key={`${i}-${paused}`} className="absolute inset-0 origin-left bg-gold" initial={{ scaleX: paused ? 1 : 0 }} animate={{ scaleX: 1 }} transition={{ duration: paused ? 0 : 6.5, ease: "linear" }} />}
+                    {k === i && <motion.span key={`${i}-${running}`} className="absolute inset-0 origin-left bg-gold" initial={{ scaleX: running ? 0 : 1 }} animate={{ scaleX: 1 }} transition={{ duration: running ? 6.5 : 0, ease: "linear" }} />}
                   </button>
                 ))}
               </div>
@@ -135,30 +136,17 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
           </dl>
         </motion.div>
 
-        {/* visuals */}
+        {/* 3D cover-flow */}
         <motion.div
-          className="relative mx-auto h-[30rem] w-full max-w-md touch-pan-y md:h-[38rem]"
-          drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.25}
-          onDragEnd={(_, info) => { if (info.offset.x < -60) go(i + 1, 1); else if (info.offset.x > 60) go(i - 1, -1); }}
+          className="relative touch-pan-y"
+          drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.12} dragSnapToOrigin
+          onDragEnd={(_, info) => { if (info.offset.x < -50) go(i + 1, 1); else if (info.offset.x > 50) go(i - 1, -1); }}
         >
-          <AnimatePresence mode="popLayout" custom={dir}>
-            <motion.div key={s.id} className="absolute inset-0">
-              <motion.div style={{ y: yA }} className="absolute left-0 top-6 z-10 w-[62%]">
-                <motion.div initial={{ opacity: 0, x: 80 * dir, rotate: -10 }} animate={{ opacity: 1, x: 0, rotate: -4 }} exit={{ opacity: 0, x: -80 * dir, rotate: -10 }} transition={{ duration: 0.9, ease }} className="relative aspect-[3/4] overflow-hidden rounded-[2rem] border border-line bg-surface shadow-[var(--shadow)]">
-                  {card(0)}
-                </motion.div>
-              </motion.div>
-              <motion.div style={{ y: yB }} className="absolute bottom-0 right-0 w-[58%]">
-                <motion.div initial={{ opacity: 0, x: 120 * dir, rotate: 12 }} animate={{ opacity: 1, x: 0, rotate: 5 }} exit={{ opacity: 0, x: -120 * dir, rotate: 12 }} transition={{ duration: 1, delay: 0.1, ease }} className="relative aspect-[3/4] overflow-hidden rounded-[2rem] border border-line bg-surface shadow-[var(--shadow)]">
-                  {card(1)}
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
-          <div className="floaty absolute right-2 top-0 z-20 grid h-28 w-28 place-items-center rounded-full border border-gold/60 bg-bg/70 text-center backdrop-blur">
+          <CoverFlow slides={slides} index={i} onSelect={(k) => go(k)} />
+          <div className="floaty pointer-events-none absolute -top-2 right-0 z-20 grid h-24 w-24 place-items-center rounded-full border border-gold/60 bg-bg/70 text-center backdrop-blur md:h-28 md:w-28">
             <div>
-              <div className="font-arabic text-3xl leading-none text-gold">عباية</div>
-              <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.25em]">Handcrafted</div>
+              <div className="font-arabic text-2xl leading-none text-gold md:text-3xl">عباية</div>
+              <div className="mt-1 text-[8px] font-bold uppercase tracking-[0.25em] md:text-[9px]">Handcrafted</div>
             </div>
           </div>
         </motion.div>
