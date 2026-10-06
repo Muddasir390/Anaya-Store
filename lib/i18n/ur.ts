@@ -148,6 +148,7 @@ export const ur: Record<Key, string> = {
   "pd.inc": "زیادہ کریں",
   "pd.saveWish": "پسندیدہ میں محفوظ کریں",
   "pd.notFound": "نہیں ملا",
+  "pd.zoom": "بڑا کر کے دیکھیں",
 
   "cart.title": "آپ کا بیگ",
   "cart.close": "بیگ بند کریں",

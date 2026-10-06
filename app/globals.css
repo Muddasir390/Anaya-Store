@@ -152,3 +152,6 @@ body {
 [dir="rtl"] .marquee-track { animation-name: marquee-rtl; }
 [dir="rtl"] .link-underline::after { transform-origin: left; }
 [dir="rtl"] .link-underline:hover::after, [dir="rtl"] .link-underline[data-active="true"]::after { transform-origin: right; }
+
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.spin-slow { animation: spin-slow 28s linear infinite; }

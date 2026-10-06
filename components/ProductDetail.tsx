@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { Check, ChevronDown, Heart, MessageCircle, Minus, Plus, Ruler, ShoppingBag } from "lucide-react";
+import { useMotionTemplate, type MotionValue } from "motion/react";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { Check, ChevronDown, Heart, MessageCircle, Minus, Plus, Ruler, ShoppingBag, ZoomIn } from "lucide-react";
 import ProductImage from "./ProductImage";
 import AbayaArt from "./AbayaArt";
 import Image from "next/image";
@@ -13,10 +14,23 @@ import { loc } from "@/lib/i18n";
 import { useT } from "./Locale";
 import type { Product } from "@/lib/types";
 
+function useTransformOrigin(x: MotionValue<number>, y: MotionValue<number>) {
+  return useMotionTemplate`${x}% ${y}%`;
+}
+
 export default function ProductDetail({ product, whatsapp }: { product: Product; whatsapp: string }) {
   const { add, wishlist, toggleWish, hydrated, setOpen } = useStore();
   const { t, locale } = useT();
   const name = loc(product, "name", locale);
+
+  // Hover-to-zoom: the photo scales up under the cursor and pans with it. Motion values only → no re-renders.
+  const reduce = useReducedMotion();
+  const zoom = useSpring(1, { stiffness: 180, damping: 24 });
+  const ox = useMotionValue(50);
+  const oy = useMotionValue(50);
+  const origin = useTransformOrigin(ox, oy);
+  const [zoomed, setZoomed] = useState(false);
+  const ZOOM = 2.3;
   const [size, setSize] = useState<string | null>(null);
   const [colorIdx, setColorIdx] = useState(0);
   const [qty, setQty] = useState(1);
@@ -56,16 +70,40 @@ export default function ProductDetail({ product, whatsapp }: { product: Product;
             </button>
           ))}
         </div>
-        <div className="relative order-1 aspect-[3/4] overflow-hidden rounded-[1.8rem] border border-line bg-surface-2 md:order-2">
+        <div
+          className={`relative order-1 aspect-[3/4] overflow-hidden rounded-[1.8rem] border border-line bg-surface-2 md:order-2 ${zoomed ? "cursor-zoom-out" : "cursor-zoom-in"} touch-pan-y`}
+          onPointerEnter={(e) => { if (e.pointerType === "mouse" && !reduce) { zoom.set(ZOOM); setZoomed(true); } }}
+          onPointerMove={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            ox.set(((e.clientX - r.left) / r.width) * 100);
+            oy.set(((e.clientY - r.top) / r.height) * 100);
+          }}
+          onPointerLeave={(e) => { if (e.pointerType === "mouse") { zoom.set(1); setZoomed(false); } }}
+          onClick={(e) => {
+            // touch / pen: tap toggles zoom at the tapped point
+            if ((e as unknown as PointerEvent).pointerType === "mouse") return;
+            const r = e.currentTarget.getBoundingClientRect();
+            ox.set(((e.clientX - r.left) / r.width) * 100);
+            oy.set(((e.clientY - r.top) / r.height) * 100);
+            const next = !zoomed;
+            zoom.set(next ? ZOOM : 1);
+            setZoomed(next);
+          }}
+        >
+          <motion.div className="absolute inset-0" style={{ scale: zoom, transformOrigin: origin, willChange: "transform" }}>
           <AnimatePresence mode="wait">
             <motion.div key={`${shot}-${product.images.length ? "" : colorIdx}`} className="absolute inset-0" initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
               {product.images.length ? (
-                <ProductImage product={product} index={shot} sizes="(min-width:1024px) 50vw, 100vw" priority />
+                <ProductImage product={product} index={shot} sizes="(min-width:1024px) 1000px, 100vw" priority />
               ) : (
                 <AbayaArt color={color?.hex} seed={product.id + shot} className="h-full w-full" />
               )}
             </motion.div>
           </AnimatePresence>
+          </motion.div>
+          <span className={`pointer-events-none absolute bottom-3 end-3 flex items-center gap-1.5 rounded-full bg-bg/80 px-3 py-1.5 text-[11px] font-semibold backdrop-blur transition-opacity duration-300 ${zoomed ? "opacity-0" : "opacity-100"}`}>
+            <ZoomIn className="h-3.5 w-3.5 text-gold" /> {t("pd.zoom")}
+          </span>
           {off > 0 && <span dir="ltr" className="absolute start-4 top-4 rounded-full bg-gold px-3 py-1 text-xs font-bold uppercase tracking-widest text-on-gold">−{off}%</span>}
         </div>
       </div>

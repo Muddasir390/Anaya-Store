@@ -151,6 +151,7 @@ export const en = {
   "pd.inc": "Increase",
   "pd.saveWish": "Save to wishlist",
   "pd.notFound": "Not found",
+  "pd.zoom": "Hover to zoom",
 
   // cart
   "cart.title": "Your Bag",

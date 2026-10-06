@@ -33,6 +33,10 @@ export default function CoverFlow({ slides, index, onSelect }: { slides: HeroSli
       }}
       onPointerLeave={() => { px.set(0); py.set(0); }}
     >
+      {/* mihrab arch frame behind the centre card */}
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 h-[96%] w-[64%] -translate-x-1/2 -translate-y-1/2 rounded-t-[999px] border border-gold/35">
+        <div className="absolute inset-3 rounded-t-[999px] border border-gold/20" />
+      </div>
       <motion.div className="absolute inset-0" style={{ transformStyle: "preserve-3d", rotateY: reduce ? 0 : sceneY, rotateX: reduce ? 0 : sceneX }}>
         {slides.map((s, k) => {
           let o = (((k - index) % n) + n + half) % n - half; // -half … +half

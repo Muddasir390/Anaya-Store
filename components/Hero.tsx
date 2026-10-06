@@ -55,6 +55,7 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
 
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yText = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  const yMark = useTransform(scrollYProgress, [0, 1], [0, 160]);
 
   // cursor glow
   const gx = useSpring(useMotionValue(200), { stiffness: 60, damping: 18 });
@@ -75,6 +76,10 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
     >
       <motion.div aria-hidden style={{ x: gx, y: gy, willChange: "transform" }} className="pointer-events-none absolute left-0 top-0 hidden h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,var(--gold)_22%,transparent),transparent_65%)] md:block" />
       <div className="pointer-events-none absolute -left-40 top-0 h-[34rem] w-[34rem] rounded-full bg-gold/15 blur-3xl" />
+      {/* giant calligraphy watermark — slow parallax */}
+      <motion.div aria-hidden style={{ y: yMark }} className="pointer-events-none absolute inset-x-0 top-6 select-none text-center font-arabic text-[16rem] leading-none text-gold opacity-[0.07] md:text-[30rem]">
+        عنایہ
+      </motion.div>
       {/* gold dust */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden style={{ display: inView ? undefined : "none" }}>
         {Array.from({ length: 12 }, (_, k) => (
@@ -145,11 +150,15 @@ export default function Hero({ slides }: { slides: HeroSlide[] }) {
           onDragEnd={(_, info) => { if (info.offset.x < -50) go(i + 1, 1); else if (info.offset.x > 50) go(i - 1, -1); }}
         >
           <CoverFlow slides={slides} index={i} onSelect={(k) => go(k)} />
-          <div className="floaty pointer-events-none absolute -top-2 end-0 z-20 grid h-24 w-24 place-items-center rounded-full border border-gold/60 bg-bg/70 text-center backdrop-blur md:h-28 md:w-28">
-            <div>
-              <div className="font-arabic text-2xl leading-none text-gold md:text-3xl">عباية</div>
-              <div className="mt-1 text-[8px] font-bold uppercase tracking-[0.25em] md:text-[9px]">{t("hero.handcrafted")}</div>
-            </div>
+          <div className="floaty pointer-events-none absolute -top-4 end-0 z-20 grid h-28 w-28 place-items-center rounded-full bg-bg/70 backdrop-blur md:h-32 md:w-32">
+            <svg viewBox="0 0 120 120" className="spin-slow absolute inset-0 h-full w-full" aria-hidden>
+              <defs><path id="ring" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0" /></defs>
+              <circle cx="60" cy="60" r="58" fill="none" stroke="var(--gold)" strokeOpacity="0.55" />
+              <text fill="var(--fg)" fontSize="9.6" fontWeight="700" letterSpacing="3.2" style={{ textTransform: "uppercase" }}>
+                <textPath href="#ring">{"Handcrafted ✦ Modest ✦ Modern ✦ "}</textPath>
+              </text>
+            </svg>
+            <div className="font-arabic text-3xl leading-none text-gold md:text-4xl">عباية</div>
           </div>
         </motion.div>
       </div>
