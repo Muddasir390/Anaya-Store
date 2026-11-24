@@ -1,29 +1,51 @@
 import "server-only";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { hasSupabase, DEFAULT_SETTINGS } from "./config";
 import { createPublicClient } from "./supabase/public";
 import { demoCategories, demoProducts, demoSettings } from "./demo-data";
 import type { Category, Product, SiteSettings } from "./types";
 
-export const getCategories = cache(async (): Promise<Category[]> => {
-  if (!hasSupabase) return demoCategories;
+/** Cross-request cache for catalogue reads (60s, purged by admin edits via updateTag). */
+const TTL = { revalidate: 60, tags: ["catalog"] };
+
+const fetchCategories = unstable_cache(async (): Promise<Category[]> => {
   const { data, error } = await createPublicClient()
     .from("categories")
     .select("*")
     .order("sort_order");
-  if (error) console.error("getCategories", error.message);
+  if (error) throw new Error(error.message);
   return (data as Category[]) ?? [];
+}, ["categories"], TTL);
+
+export const getCategories = cache(async (): Promise<Category[]> => {
+  if (!hasSupabase) return demoCategories;
+  try {
+    return await fetchCategories();
+  } catch (e) {
+    console.error("getCategories", e);
+    return [];
+  }
 });
 
-export const getProducts = cache(async (): Promise<Product[]> => {
-  if (!hasSupabase) return demoProducts;
+const fetchProducts = unstable_cache(async (): Promise<Product[]> => {
   const { data, error } = await createPublicClient()
     .from("products")
     .select("*")
     .eq("is_active", true)
     .order("created_at", { ascending: false });
-  if (error) console.error("getProducts", error.message);
+  if (error) throw new Error(error.message);
   return ((data as Product[]) ?? []).map(normalizeProduct);
+}, ["products"], TTL);
+
+export const getProducts = cache(async (): Promise<Product[]> => {
+  if (!hasSupabase) return demoProducts;
+  try {
+    return await fetchProducts();
+  } catch (e) {
+    console.error("getProducts", e);
+    return [];
+  }
 });
 
 export const getProduct = cache(async (slug: string): Promise<Product | null> => {
@@ -31,10 +53,21 @@ export const getProduct = cache(async (slug: string): Promise<Product | null> =>
   return all.find((p) => p.slug === slug) ?? null;
 });
 
+const fetchSettingRows = unstable_cache(async () => {
+  const { data, error } = await createPublicClient().from("site_settings").select("*");
+  if (error) throw new Error(error.message);
+  return (data ?? []) as { key: string; value: string }[];
+}, ["site_settings"], TTL);
+
 export const getSettings = cache(async (): Promise<SiteSettings> => {
   if (!hasSupabase) return demoSettings;
-  const { data } = await createPublicClient().from("site_settings").select("*");
-  const map = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]));
+  let rows: { key: string; value: string }[] = [];
+  try {
+    rows = await fetchSettingRows();
+  } catch (e) {
+    console.error("getSettings", e);
+  }
+  const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
   return {
     store_name: map.store_name || DEFAULT_SETTINGS.store_name,
     whatsapp_number: map.whatsapp_number || DEFAULT_SETTINGS.whatsapp_number,

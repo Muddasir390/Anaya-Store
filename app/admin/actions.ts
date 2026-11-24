@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
@@ -139,6 +139,7 @@ export async function saveProduct(_p: FormState, fd: FormData): Promise<FormStat
     if (error) return { error: error.message };
   }
   revalidatePath("/", "layout");
+  updateTag("catalog");
   redirect("/admin/products");
 }
 
@@ -147,6 +148,7 @@ export async function deleteProduct(id: string) {
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
+  updateTag("catalog");
   return { ok: true };
 }
 
@@ -155,6 +157,7 @@ export async function toggleProductActive(id: string, active: boolean) {
   const { error } = await supabase.from("products").update({ is_active: active }).eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
+  updateTag("catalog");
   return { ok: true };
 }
 
@@ -175,6 +178,7 @@ export async function saveCategory(_p: FormState, fd: FormData): Promise<FormSta
   const { error } = id ? await supabase.from("categories").update(row).eq("id", id) : await supabase.from("categories").insert(row);
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
+  updateTag("catalog");
   return { ok: true };
 }
 
@@ -183,6 +187,7 @@ export async function deleteCategory(id: string) {
   const { error } = await supabase.from("categories").delete().eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
+  updateTag("catalog");
   return { ok: true };
 }
 
@@ -197,5 +202,6 @@ export async function saveSettings(_p: FormState, fd: FormData): Promise<FormSta
   const { error } = await supabase.from("site_settings").upsert(rows);
   if (error) return { error: error.message };
   revalidatePath("/", "layout");
+  updateTag("catalog");
   return { ok: true };
 }
